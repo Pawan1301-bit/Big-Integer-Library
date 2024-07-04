@@ -1,6 +1,4 @@
 #include <bits/stdc++.h>
-#include <iostream>
-#include <vector>
 
 using namespace std;
 
@@ -13,7 +11,7 @@ public:
     BigInt(unsigned long long n = 0); // unsigned means all the non negative number
     BigInt(string &);                 // take the string by reference  as parameter
     BigInt(const char *);             // pointer pointing to the constant char
-    BigInt(BigInt &);
+    BigInt(BigInt &);  
 
     // helper function
     friend void divide_by_2(BigInt &a);
@@ -52,7 +50,7 @@ public:
     friend BigInt &operator*=(BigInt &, const BigInt &);
     friend BigInt operator*(const BigInt &, const BigInt &);
     friend BigInt &operator/=(BigInt &, const BigInt &);
-    friend BigInt &operator/(const BigInt &, const BigInt &);
+    friend BigInt operator/(const BigInt &, const BigInt &);
 
     // modulo
     friend BigInt &operator%=(BigInt &, const BigInt &);
@@ -67,7 +65,7 @@ public:
 
     // read and write
     friend ostream &operator<<(ostream &, const BigInt &);
-    friend istream &operator>>(istream &, const BigInt &);
+    friend istream &operator>>(istream &,  BigInt &);
 
     // others
     friend BigInt Catalan(int n);
@@ -152,6 +150,7 @@ bool operator<(const BigInt &a, const BigInt &b){
     }
 }
 
+// -- ????
 bool operator>(const BigInt &a, const BigInt &b){
     return b < a;   //using the preivious define operator < here
 }
@@ -182,10 +181,9 @@ BigInt &BigInt::operator++(){
 }
 
 BigInt BigInt::operator++(int temp){
-    BigInt temp;
-    temp = *this;
+    BigInt tp = *this;
     ++(*this);
-    return temp;
+    return tp;
 }
 
 BigInt &BigInt::operator--(){
@@ -202,10 +200,9 @@ BigInt &BigInt::operator--(){
 }
 
 BigInt BigInt::operator--(int temp){
-    BigInt temp;
-    temp = *this;
+    BigInt tx = (*this);
     --(*this);
-    return temp;
+    return tx;
 }
 
 BigInt &operator +=(BigInt &a, const BigInt &b){
@@ -233,6 +230,7 @@ BigInt operator+(const BigInt &a, const BigInt &b){
     return temp += b;
 }
 
+// ----  ????
 BigInt &operator-=(BigInt &a, const BigInt &b){
     if(a <b)
         throw("Underflow first number  is smaller than second");
@@ -244,22 +242,240 @@ BigInt &operator-=(BigInt &a, const BigInt &b){
         else 
             s = a.digits[i] + borrow;
         if(s < 0)
-            s += 10, t = -1;
+            s += 10, borrow = -1;
         else    
-            t=0;
+            borrow = 0;
         a.digits[i] = s;
     }
-    while()
+    while(n > 1 && a.digits[n-1] == 0){
+        a.digits.pop_back();
+        n--;
+    }
+    return a;
 }
 
-BigInt operator-(cosnt BigInt &a, const BigInt & b){
+BigInt operator-(const BigInt &a, const BigInt & b){
     BigInt temp;
     temp = a;
-    sreturn (temp -= b);
+    temp -= b;
+    return temp;
 }
 
+BigInt &operator*=(BigInt &a, const BigInt &b){
+    if(Null(a) || Null(b)){
+        a = BigInt();
+        return a;
+    }
+
+    int n= a.digits.size(), m= b.digits.size();
+    vector<int> v(n+m, 0);
+    for(int i=0; i<n; i++){
+        for(int j=0; j<m; j++){
+            v[i+j] += (a.digits[i])*(b.digits[j]);
+        }
+    }
+
+    n += m;
+    a.digits.resize(v.size());
+    for( int s, i=0, t =0; i<n; i++ ){
+        s = t + v[i];
+        v[i] = s% 10;
+        t = s/10;
+        a.digits[i] = v[i];
+    }
+    for(int i=n-1; i>=1 && !v[i]; i--){
+        a.digits.pop_back();
+    }
+    return a;
+    }
+
+BigInt operator*(const BigInt &a, const BigInt &b){ 
+    BigInt temp;
+    temp = a;
+    temp *= b;
+    return temp;
+}
+
+BigInt &operator /= (BigInt& a, const BigInt &b){
+    if(Null(b))
+        throw("error cannot be divisible by 0");
+    if(a < b){
+        a = BigInt();
+        return a;
+    }
+    if(a == b){
+        a = BigInt(1);
+        return a;
+    }
+    int i, lgcat = 0, cc;
+    int n = Length(a), m = Length(b);
+    vector<int> cat(n, 0);
+    BigInt t;
+    for(i = n-1; t*10 + a.digits[i] < b; i--){
+        t *= 10;
+        t += a.digits[i];
+    }
+    for(; i>=0; i--){
+        t = t*10 + a.digits[i];
+        for(cc = 9; cc*b>t; cc--);
+            t -= cc * b;
+            cat[lgcat++] = cc;
+    }
+    a.digits.resize(cat.size());
+    for(int i=0; i<lgcat; i++){
+        a.digits[i] = cat[lgcat - i - 1];
+    }
+    a.digits.resize(lgcat);
+    return a;
+}
+
+BigInt operator/(const BigInt &a,const BigInt &b){
+    BigInt temp;
+    temp = a;
+    temp /= b;
+    return temp;
+}
+
+BigInt &operator%=(BigInt& a, const BigInt& b){
+    if(Null(b))
+        throw("error module by 0 is not possible");
+    if(a < b)
+        return a;
+    if(a == b)  {
+        a = BigInt();
+        return a;
+    }
+
+    int i, lgcat=0, cc;
+    int n= Length(a), m = Length(b);
+    vector<int> cat(n, 0);
+    BigInt t;
+    for(i = n-1; t*10+a.digits[i] < b; i--){
+        t *= 10;
+        t += a.digits[i];
+    }
+    for (; i >= 0; i--){
+        t = t * 10 + a.digits[i];
+        for (cc = 9; cc * b > t;cc--);
+        t -= cc * b;
+        cat[lgcat++] = cc;
+    }
+    a = t;
+    return a;
+}
+
+BigInt operator%(const BigInt &a,const BigInt &b){
+    BigInt temp;
+    temp = a;
+    temp %= b;
+    return temp;
+}
+
+BigInt &operator^=(BigInt &a, const BigInt &b){
+    BigInt expo, base(a);
+    expo = b;
+    a = 1;
+    while(!Null(expo)){
+        if(expo[0] & 1)
+            a *= base;
+        base *= base;
+        divide_by_2(expo);
+    }
+    return a;
+}
+
+BigInt operator^(BigInt & a,BigInt & b){
+    BigInt temp(a);
+    temp ^= b;
+    return temp;
+}
+
+void divide_by_2(BigInt &a){
+    int add =0;
+    for(int i = a.digits.size()-1; i>=0; i--){
+        int digit = (a.digits[i] >> 1) + add;   //we use right shift operator to divide it by 2
+        add = ((a.digits[i] & 1) * 5);
+        a.digits[i] = digit;
+    }
+    while(a.digits.size() > 1 && !a.digits.back()){
+        a.digits.pop_back();
+    }
+}
+
+BigInt sqrt(BigInt &a){
+    BigInt left(1), right(a), v(1), mid, prod;
+    divide_by_2(right);
+    while(left <= right){
+        mid += left;
+        mid += right;
+        divide_by_2(mid);
+        prod = mid*mid;
+        if(prod <= a){
+            v = mid;
+            ++mid;
+            left = mid;
+        }else{
+            --mid;
+            right = mid;
+        }
+        mid = BigInt();
+    }
+    return v;
+}
+
+BigInt Catalan(int n){
+    BigInt a(1), b;
+    for(int i=2; i<=n; i++){
+        a *= i;
+    b = a;
+    for(int i = n+1; i <= 2*n; i++)
+        b *= i;
+    a *= a;
+    a *= (n+1);
+    b /= a;
+    return b;
+    }
+}
+
+BigInt Fibomacci(int n){
+    BigInt a(1), b(1), c;
+    if(!n)
+        return c;
+    n--;
+    while(n--){
+        c = a + b;
+        b = a;
+        a = c;
+    }
+    return b;
+}
+ 
+BigInt Factorial(int n){
+    BigInt f(1);
+    for (int i = 2; i <= n;i++)
+        f *= i;
+    return f;
+}
+ 
+istream &operator>>(istream &in,BigInt&a){
+    string s;
+    in >> s;
+    int n = s.size();
+    for (int i = n - 1; i >= 0;i--){
+        if(!isdigit(s[i]))
+            throw("INVALID NUMBER");
+        a.digits[n - i - 1] = s[i];
+    }
+    return in;
+}
+ 
+ostream &operator<<(ostream &out,const BigInt &a){
+    for (int i = a.digits.size() - 1; i >= 0;i--)
+        cout << (short)a.digits[i];
+    return cout;
+}
 int main()
 {
-    
+    cout << "hello world";
     return 0;
 }
