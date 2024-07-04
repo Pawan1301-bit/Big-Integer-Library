@@ -252,11 +252,11 @@ BigInt &operator-=(BigInt &a, const BigInt &b){
 BigInt operator-(cosnt BigInt &a, const BigInt & b){
     BigInt temp;
     temp = a;
-    return (temp -= b);
+    sreturn (temp -= b);
 }
 
 int main()
 {
-    cout << "Version 3";
+    cout << "Version 3 again ";
     return 0;
 }
