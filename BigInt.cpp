@@ -257,5 +257,6 @@ BigInt operator-(cosnt BigInt &a, const BigInt & b){
 
 int main()
 {
+    cout << "Version 3";
     return 0;
 }
