@@ -257,6 +257,5 @@ BigInt operator-(cosnt BigInt &a, const BigInt & b){
 
 int main()
 {
-    cout << "hello";s
     return 0;
 }
