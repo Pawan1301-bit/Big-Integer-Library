@@ -1,0 +1,11 @@
+--> When to use const ??
+using const indicates that the  function does  not modify the object passed to it. If it used for parameters that means it should not be changed by the function 
+
+--> why we use friend func(BigInt &) ??
+using this indicates that we pass the object of BigInt by reference means any change in the value of orignal object that passed 
+
+-->why in pre increment/decrement we pass the value by reference and not in post
+pre increment/ decrement passing value by refrence allow the user to modify the value before using while in post we do not want to modify this before using 
+
+--> can we implement the constructor outside the class 
+after defining the constructor inside the class we can  implement it outside the class 
